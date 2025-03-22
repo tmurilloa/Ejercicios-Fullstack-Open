@@ -10,14 +10,37 @@ const GiveFeedback = () => {
     <h1>Give feedback</h1>
   )
 }
-const Statistics = () => {
+const Statistics = (props) => {
+  const [objGood, objNeutral, objBad, objAll, objAverage, objPositive] = props.props
+  if (objAll.cont > 0){
+    return(
+      <>
+      <h1>Statistics</h1>
+      <table>
+      <StatisticsLine name={objGood.name} contador={objGood.cont}/>
+      <StatisticsLine name={objNeutral.name} contador={objNeutral.cont}/>
+      <StatisticsLine name={objBad.name} contador={objBad.cont}/>
+      <StatisticsLine name={objAll.name} contador={objAll.cont}/>
+      <StatisticsLine name={objAverage.name} contador={objAverage.cont}/>
+      <StatisticsLine name={objPositive.name} contador={objPositive.cont}/>
+      </table>
+      </>
+    )
+  } 
   return(
-    <h1>Statistics</h1>
+    <h2>No feedback given</h2>
   )
 }
-const Counter = ({name, contador}) => {
+const StatisticsLine = ({name, contador}) => {
   return(
-    <p>{name} {contador}</p>
+    <>
+    <tbody>
+      <tr>
+        <td>{name}</td>
+        <td>{contador}</td>
+      </tr>
+    </tbody>
+    </>
   )
 }
 
@@ -41,7 +64,6 @@ function App() {
     setPositive(porcentaje.toFixed(5))
 
     const promedio = (average + 1) 
-    console.log(average)
     setAverage(promedio)
   }
   const handleNeutralClick = () => {
@@ -55,7 +77,6 @@ function App() {
     setPositive(porcentaje.toFixed(5))
 
     const promedio = (average + 0) 
-    console.log(promedio)
     setAverage(promedio)
   }
   const handleBadClick = () => {
@@ -69,9 +90,36 @@ function App() {
     setPositive(porcentaje.toFixed(5))
 
     const promedio = (average - 1) 
-    console.log(promedio)
     setAverage(promedio)
   }
+
+  //Definicion de los objetos para pasarlos a los componentes
+  const arrayObj = [{
+    name: "good",
+    cont: contGood
+  },
+  {
+    name: "neutral",
+    cont: contNeutral
+  },
+  {
+    name: "bad",
+    cont: contBad
+  },
+  {
+    name: "all",
+    cont: all
+  },
+  {
+    name: "average",
+    cont: average/all
+  },
+  {
+    name: "positive",
+    cont: positive + " %"
+  }
+  ]
+
 
   return (
     <div>
@@ -79,13 +127,8 @@ function App() {
       <Button name={"good"} handler={handleGoodClick}/>
       <Button name={"neutral"} handler={handleNeutralClick}/>
       <Button name={"bad"} handler={handleBadClick}/>
-      <Statistics/>
-      <Counter name={"good"} contador={contGood}/>
-      <Counter name={"neutral"} contador={contNeutral}/>
-      <Counter name={"bad"} contador={contBad}/>
-      <Counter name={"all"} contador={all}/>
-      <Counter name={"average"} contador={average/all}/>
-      <Counter name={"positive"} contador={positive + " %"}/>
+      <Statistics props={arrayObj}/>
+      
     </div>
   )
 }
