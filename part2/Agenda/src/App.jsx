@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const Filter = ({type,value,onChange}) => {
   return (
@@ -33,11 +34,8 @@ const Persons = ({Personas}) => {
 }
 
 function App() {
-  const [personas, setPersonas] = useState([
-    {name: 'Arto Hellas', number: 3168227258, id: 1},
-    {name: 'Tomas Murillo', number: 123, id: 2},
-    {name: 'Ada Lovelace', number: 987, id: 3}
-  ])
+  // Definiciones de State Hooks y variables
+  const [personas, setPersonas] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter,  setFilter] = useState('')
@@ -45,6 +43,7 @@ function App() {
   personas 
   :personas.filter((persona) => persona.name.toLowerCase().includes(filter.toLowerCase()))
 
+  // funcion que nos permite anadir una persona, asegurandose que nos exista antes
   const addPersona = (event) =>{
     event.preventDefault()
     const persona = {name: newName, number: newNumber, id: personas.length + 1}
@@ -60,7 +59,8 @@ function App() {
     setNewNumber('')
     
   }
- 
+  
+  // Handlers para manejar el cambio en los inputs 
   const handleFilter = (event) => {
     setFilter(event.target.value)
   }
@@ -71,6 +71,15 @@ function App() {
     setNewName(event.target.value)
   }
 
+  // Hook efect para traer los datos establecidos en la bd de db.json/persons
+  const hook = () => {
+    axios.
+      get('http://localhost:3001/persons')
+      .then(response => {
+        setPersonas(response.data)
+      })
+  }
+  useEffect(hook, [])
 
   return (
     <div>
