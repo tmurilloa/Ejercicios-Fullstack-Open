@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
 const Filter = ({type,value,onChange}) => {
   return (
@@ -24,11 +24,25 @@ const PersonForm = ({onSubmit, objectName, objectNumber}) => {
     </form>
   )
 }
+const DeleteButton = ({persona, setPersonas, personas}) => {
+  const handlerDeleteButton = (id) =>{
+    if (window.confirm(`Do you want to delete ${persona.name}`)){
+      personService.deletePerson(id)
+      .then((personReturned) => {
+        setPersonas(personas
+            .filter(person => person.id !== personReturned.id))
+      })
+    }
+  }
+  return(
+    <button onClick={() => handlerDeleteButton(persona.id)}>delete</button>
+  )
+}
 
-const Persons = ({Personas}) => {
+const Persons = ({Personas, setPersonas}) => {
   return(
     <>
-    {Personas.map((persona) => <p key={persona.id}>{persona.name} {persona.number}</p>)}
+    {Personas.map((persona) => <p key={persona.id}>{persona.name} {persona.number} <DeleteButton persona={persona} setPersonas={setPersonas} personas={Personas}/></p>)}
     </>
   )
 }
@@ -43,21 +57,40 @@ function App() {
   personas 
   :personas.filter((persona) => persona.name.toLowerCase().includes(filter.toLowerCase()))
 
+  const handlerUpdateInfo= (persona) =>{
+    console.log(persona);
+    if(window.confirm(`${persona.name} is already added to phonebook, replace the older number with a new one?`)){
+      personService.updateInfo({...persona, number: newNumber})
+        .then((personReturned) => {
+          setPersonas(
+            personas.map(personaAux => personaAux.id !== persona.id ? personaAux : personReturned)
+          )
+        })
+    }
+  }
   // funcion que nos permite anadir una persona, asegurandose que nos exista antes
   const addPersona = (event) =>{
     event.preventDefault()
-    const persona = {name: newName, number: newNumber, id: personas.length + 1}
+    const persona = {
+      name: newName, 
+      number: newNumber, 
+      id: `${personas.length + 1}`}
 
     const ExistePersona = personas.some(personaAux => personaAux.name === persona.name)
     if (ExistePersona){
-      alert(`${persona.name} is already added to phonebook`)
+      const personaAux = personas.find(
+        (personaFun) => personaFun.name === persona.name
+      )
+      handlerUpdateInfo(personaAux)
     }
     else{
-      setPersonas(personas.concat(persona))
+      personService.create(persona)
+        .then((personReturned) => {
+          setPersonas(personas.concat(personReturned))
+        })
     }
     setNewName('')
     setNewNumber('')
-    
   }
   
   // Handlers para manejar el cambio en los inputs 
@@ -73,14 +106,13 @@ function App() {
 
   // Hook efect para traer los datos establecidos en la bd de db.json/persons
   const hook = () => {
-    axios.
-      get('http://localhost:3001/persons')
-      .then(response => {
-        setPersonas(response.data)
-      })
+    personService.getAll()
+      .then((initialPersonas => setPersonas(initialPersonas)))
   }
   useEffect(hook, [])
 
+
+  // Lo que se muestra en la aplicacion
   return (
     <div>
       <h2>Phonebook</h2>
@@ -91,7 +123,7 @@ function App() {
       objectNumber={{type: 'number', value: newNumber, onChange: handleNumberChange}}
       />
       <h3>Numbers</h3>
-      <Persons Personas={filterPersonas}/>
+      <Persons Personas={filterPersonas} setPersonas={setPersonas}/>
     </div>
   )
 }
