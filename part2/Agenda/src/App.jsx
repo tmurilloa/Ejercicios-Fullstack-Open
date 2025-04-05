@@ -1,6 +1,19 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
+
+const Notification = ({message, className}) => {
+  if (message === null){
+    return null
+  }
+  console.log(message)
+  console.log(className);
+  return(
+    <div className={className}>
+      {message}
+    </div>
+  )
+}
 const Filter = ({type,value,onChange}) => {
   return (
     <div>
@@ -53,9 +66,26 @@ function App() {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter,  setFilter] = useState('')
+  const [Message, setMessage] = useState(null)
+  const [classNameNotification, setClassNameNotification] = useState('')
   const filterPersonas = filter === ''  ? 
   personas 
   :personas.filter((persona) => persona.name.toLowerCase().includes(filter.toLowerCase()))
+
+  const handlerAddedMessage = (persona) => {
+    setMessage(`Added ${persona.name}`)
+    setClassNameNotification('Added')
+    setTimeout(() =>{
+      setMessage(null)
+    }, 5000)
+  }
+  const handlerErrorMessage = (persona) => {
+    setMessage(`Information of ${persona.name} has already been removed form server`)
+    setClassNameNotification('Error')
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
 
   const handlerUpdateInfo= (persona) =>{
     console.log(persona);
@@ -65,6 +95,9 @@ function App() {
           setPersonas(
             personas.map(personaAux => personaAux.id !== persona.id ? personaAux : personReturned)
           )
+        })
+        .catch(() => {
+          handlerErrorMessage(persona)
         })
     }
   }
@@ -88,6 +121,7 @@ function App() {
         .then((personReturned) => {
           setPersonas(personas.concat(personReturned))
         })
+      handlerAddedMessage(persona)
     }
     setNewName('')
     setNewNumber('')
@@ -116,6 +150,7 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={Message} className={classNameNotification}/>
       <Filter type={'text'} value={filter} onChange={handleFilter}/>
       <h3>add a new</h3>
       <PersonForm onSubmit={addPersona} 
