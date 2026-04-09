@@ -77,8 +77,8 @@ function App() {
       setMessage(null)
     }, 5000)
   }
-  const handlerErrorMessage = (persona) => {
-    setMessage(`Information of ${persona.name} has already been removed form server`)
+  const handlerErrorMessage = (errorMessage) => {
+    setMessage(errorMessage)
     setClassNameNotification('Error')
     setTimeout(() => {
       setMessage(null)
@@ -94,8 +94,8 @@ function App() {
             personas.map(personaAux => personaAux.id !== persona.id ? personaAux : personReturned)
           )
         })
-        .catch(() => {
-          handlerErrorMessage(persona)
+        .catch((error) => {
+          handlerErrorMessage(error.response.data.error)
         })
     }
   }
@@ -118,11 +118,16 @@ function App() {
       personService.create(persona)
         .then((personReturned) => {
           setPersonas(personas.concat(personReturned))
+          handlerAddedMessage(personReturned)
+          setNewName('')
+          setNewNumber('')
         })
-      handlerAddedMessage(persona)
+        .catch(error => {
+          console.log(error.response.data.error)
+          handlerErrorMessage(error.response.data.error)
+        })
+      
     }
-    setNewName('')
-    setNewNumber('')
   }
   
   // Handlers para manejar el cambio en los inputs 
@@ -130,7 +135,7 @@ function App() {
     setFilter(event.target.value)
   }
   const handleNumberChange = (event) => {
-    setNewNumber(Number(event.target.value))
+    setNewNumber(event.target.value)
   }
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -153,7 +158,7 @@ function App() {
       <h3>add a new</h3>
       <PersonForm onSubmit={addPersona} 
       objectName={{type: 'text', value: newName, onChange: handleNameChange}}
-      objectNumber={{type: 'number', value: newNumber, onChange: handleNumberChange}}
+      objectNumber={{type: 'text', value: newNumber, onChange: handleNumberChange}}
       />
       <h3>Numbers</h3>
       <Persons Personas={filterPersonas} setPersonas={setPersonas}/>

@@ -1,0 +1,36 @@
+{
+  "name": "ejercicios-parte3-fullstackopen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmurilloa/Ejercicios-Parte3-FullstackOpen.git"
+  },
+  "author": "Tomas Murillo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tmurilloa/Ejercicios-Parte3-FullstackOpen/issues"
+  },
+  "homepage": "https://github.com/tmurilloa/Ejercicios-Parte3-FullstackOpen#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^10.2.0",
+    "globals": "^17.4.0",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^9.1.5",
+    "morgan": "^1.10.1"
+  }
+}
